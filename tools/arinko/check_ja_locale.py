@@ -101,6 +101,16 @@ def check_yaml(list_english):
         print('    タグが違う:', k, '| en:', en[k], '| ja:', ja[k])
     problems += bad_vars + bad_tags
 
+    # 監査ログ(lib/submissions/generate_audit_trail.rb)は <b>(.*?)</b>(.*) で切り出し、<b> より前を捨てる。
+    # en が <b> で始まる submission_event_names は、ja も <b> で始めないと署名者名が監査ログから消える
+    bad_lead = sorted(k for k, v in en.items()
+                      if k.startswith('submission_event_names.') and str(v).startswith('<b>')
+                      and k in ja and not str(ja[k]).startswith('<b>'))
+    print(f'[2] 監査ログの行が <b> で始まらないキー {len(bad_lead)} 件')
+    for k in bad_lead:
+        print('    <b> の前に文字がある:', k, '| ja:', ja[k])
+    problems += bad_lead
+
     same = sorted(k for k in ar_ja if k in en and ar_ja[k] == en[k] and not SAME_OK.match(k.split('.')[-1])
                   and re.search(r'[A-Za-z]{3,}', str(en[k])))
     print(f'[参考] ja の値が en と同じで、訳し忘れの疑いがあるキー {len(same)} 件')

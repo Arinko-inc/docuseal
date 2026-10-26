@@ -74,3 +74,9 @@ python3 tools/arinko/check_ja_locale.py --list-english
 
 `docker build` で本体のイメージを作り、管理画面を日本語（アカウント設定の言語で「日本語」を選ぶ）で開くと、英語が残っている画面を目で探せる。
 文言だけの変更なので、データベースや API には影響しない。
+
+## 監査ログの訳の語順(submission_event_names)
+
+監査ログの PDF(`lib/submissions/generate_audit_trail.rb`)は、各行を `<b>(.*?)</b>(.*)` で太字と残りに分け、`<b>` より前の文字を捨てる。
+日本語の語順で署名者名を文頭に置くと、監査ログから署名者名が消える。`submission_event_names` の訳は必ず `<b>` で始め、
+署名者名・宛先は後ろに置く(例 `<b>署名を完了</b> 署名者: %{submitter_name}`)。`check_ja_locale.py` の [2] がこれを検査する。
